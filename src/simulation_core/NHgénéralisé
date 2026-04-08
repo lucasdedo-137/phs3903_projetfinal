@@ -1,1 +1,21 @@
+def temperature_xi(sys, xi_mix, xi_rot, xi_trans, kB=1.0): 
+   #définition d'une température généralisée
+   #xi_mix= mesure dans laquelle la température reflète les degrés de rotation
+   #xi_rot=mesure pour la rot de la prise en compte des degrés cinétiques
+   #xi_trans= mesure pour la trans de la prise en compte des degrés cinétiques
+
+    F2 = np.sum(sys.F * sys.F)
+    T2 = np.sum(sys.T * sys.T)
+
+    num_trans = xi_trans * F2 + (1.0 - xi_trans) * (2.0 * sys.K_trans / sys.M)
+    den_trans = xi_trans * sys.Lap_trans + (1.0 - xi_trans) * (3.0 * sys.N / sys.M)
+
+    num_rot = xi_rot * T2 + (1.0 - xi_rot) * np.sum((sys.L * sys.L) / (sys.I[None, :] ** 2))
+    den_rot = xi_rot * sys.Lap_rot + (1.0 - xi_rot) * (sys.N * np.sum(1.0 / sys.I))
+
+    num = (1.0 - xi_mix) * num_trans + xi_mix * num_rot
+    den = (1.0 - xi_mix) * den_trans + xi_mix * den_rot
+
+    return num / (kB * den)
+
 
